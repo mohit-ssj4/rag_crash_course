@@ -11,3 +11,7 @@ wheels/
 
 .env
 data/vector_store
+
+# Pytest and Ruff caches
+.pytest_cache/
+.ruff_cache/
