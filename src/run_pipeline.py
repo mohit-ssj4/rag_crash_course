@@ -1,41 +1,14 @@
-import json
-
-from src.data_chunker import DataChunker
-from src.data_loader import DataLoader
-from src.embedding_manager import EmbeddingManager
-from src.rag_retriever import RAGRetriever
-from src.vector_store import VectorStore
+from src.cli import handle_ingest, handle_interactive
 
 
 def run_pipeline() -> None:
-    # Step 1: Loading the txt files and converting them into Langchain documents
-    data_loader = DataLoader()
-    documents = data_loader.load_data()
+    """Retrofits the legacy pipeline script as a backward-compatible wrapper.
 
-    # Step 2: Chunking the data for embedding it into Vector DB
-    data_chunker = DataChunker()
-    chunks = data_chunker.chunk_data(documents)
-
-    # Step 3: Embedding the data to convert the chunks into vectors
-    embedding_manager = EmbeddingManager()
-    texts = [doc.page_content for doc in chunks]
-    embeddings = embedding_manager.generate_embeddings(texts)
-
-    # Step 4: Adding generated emeddings in the Vector store
-    vector_store = VectorStore()
-    vector_store.add_documents(chunks, embeddings)
-
-    # Step 5: Retieve data from RAG
-    retriever = RAGRetriever(vector_store, embedding_manager)
-
-    while True:
-        query = input("\nEnter your query: ").strip()
-
-        if query in ["quit", "exit"]:
-            break
-
-        result = retriever.generate_response(query)
-        print(f"\n\nLLM Response: {json.dumps(result, indent=4, ensure_ascii=False)}")
+    This delegates directly to the decoupled CLI ingestion and interactive loop
+    to prevent any logic duplication or startup indexing overhead.
+    """
+    handle_ingest()
+    handle_interactive()
 
 
 if __name__ == "__main__":
