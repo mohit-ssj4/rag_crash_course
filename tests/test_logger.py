@@ -1,7 +1,4 @@
-import logging
 import re
-
-import pytest
 
 from src import logger
 

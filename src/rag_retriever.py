@@ -172,7 +172,7 @@ Question: {query}"""
                     ],
                 )
                 break
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 if attempt == max_retries:
                     logger.error(
                         f"Groq API connection failed after {max_retries} attempts: {e}"

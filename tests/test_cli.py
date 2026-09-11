@@ -1,13 +1,10 @@
 import sys
 
-import pytest
-
 from src import cli
 
 
 def test_cli_parser_ingest(monkeypatch):
     monkeypatch.setattr(sys, "argv", ["src/cli.py", "ingest"])
-    parser = cli.argparse.ArgumentParser()
     # Stub CLI handlers to test parsing
     called = []
     monkeypatch.setattr(cli, "handle_ingest", lambda: called.append("ingest"))

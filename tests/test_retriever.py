@@ -1,7 +1,5 @@
 from unittest.mock import MagicMock
 
-import pytest
-
 from src.embedding_manager import EmbeddingManager
 from src.rag_retriever import RAGRetriever
 from src.vector_store import VectorStore
@@ -69,10 +67,12 @@ def test_rag_retriever_groq_retry_success(monkeypatch):
         nonlocal call_count
         call_count += 1
         if call_count < 3:
-            raise Exception("Transient Groq HTTP Error")
+            raise RuntimeError("Transient Groq HTTP Error")
         return success_response
 
-    monkeypatch.setattr("src.rag_retriever.groq_client.chat.completions.create", mock_create)
+    monkeypatch.setattr(
+        "src.rag_retriever.groq_client.chat.completions.create", mock_create
+    )
     # Mock sleep to run instantly without delay during test execution
     monkeypatch.setattr("time.sleep", lambda *args, **kwargs: None)
 
@@ -103,9 +103,11 @@ def test_rag_retriever_groq_retry_exhausted_fallback(monkeypatch):
 
     # Always raise errors
     def mock_create(*args, **kwargs):
-        raise Exception("Fatal Groq API Outage")
+        raise RuntimeError("Fatal Groq API Outage")
 
-    monkeypatch.setattr("src.rag_retriever.groq_client.chat.completions.create", mock_create)
+    monkeypatch.setattr(
+        "src.rag_retriever.groq_client.chat.completions.create", mock_create
+    )
     monkeypatch.setattr("time.sleep", lambda *args, **kwargs: None)
 
     result = retriever.generate_response("hello query")
