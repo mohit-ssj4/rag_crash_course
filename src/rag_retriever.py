@@ -1,8 +1,9 @@
 from typing import Any
+
 from src.embedding_manager import EmbeddingManager
 from src.llm_client import groq_client, model_name
-from src.vector_store import VectorStore
 from src.logger import get_logger
+from src.vector_store import VectorStore
 
 logger = get_logger("rag_retriever")
 
@@ -16,7 +17,9 @@ class RAGRetriever:
         embedding_manager: Manager for generating query embeddings
     """
 
-    def __init__(self, vector_store: VectorStore, embedding_manager: EmbeddingManager) -> None:
+    def __init__(
+        self, vector_store: VectorStore, embedding_manager: EmbeddingManager
+    ) -> None:
         """
         Initialize the retriever
 
@@ -136,7 +139,7 @@ class RAGRetriever:
             }
             for doc in rag_results
         ]
-        
+
         # Protect confidence score boundary constraints (0.0 to 100.0)
         raw_confidence = max([doc["similarity_score"] for doc in rag_results]) * 100
         confidence = max(0.0, min(100.0, raw_confidence))
@@ -153,21 +156,45 @@ Context:
 
 Question: {query}"""
 
-        response = groq_client.chat.completions.create(
-            model=model_name,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt},
-            ],
-        )
+        import time
+
+        max_retries = 3
+        backoff = 1.0  # seconds
+        response = None
+
+        for attempt in range(max_retries + 1):
+            try:
+                response = groq_client.chat.completions.create(
+                    model=model_name,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt},
+                    ],
+                )
+                break
+            except Exception as e:
+                if attempt == max_retries:
+                    logger.error(
+                        f"Groq API connection failed after {max_retries} attempts: {e}"
+                    )
+                    return default_response
+                logger.warning(
+                    f"Groq API call transient failure: {e}. "
+                    f"Retrying in {backoff:.2f} seconds (attempt {attempt + 1}/{max_retries})..."
+                )
+                time.sleep(backoff)
+                backoff *= 2.0
+
+        if response is None:
+            return default_response
 
         answer = response.choices[0].message.content or ""
         if not answer.strip():
             return default_response
 
         output: dict[str, Any] = {
-            "answer": answer.strip(), 
-            "confidence": f"{confidence:.2f}%"
+            "answer": answer.strip(),
+            "confidence": f"{confidence:.2f}%",
         }
 
         if show_sources:
