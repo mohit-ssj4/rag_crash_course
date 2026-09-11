@@ -125,6 +125,13 @@ Expose a subcommand `python src/cli.py interactive` to start an interactive mult
 - Drops user into interactive shell `Aurora-RAG >`.
 - Supports typing `exit` or `quit` to cleanly exit.
 
+#### FR-12: CLI Output Enhancement
+In both direct query and interactive CLI sessions, the application must format and output the generated LLM response, the confidence score in percentages, and the individual document source citations on separate, dedicated lines.
+**Consequences (testable):**
+- Output contains separate lines clearly labeled: `LLM Response:`, `Confidence Score:`, and `Sources:`.
+- If sources are present, they are printed as: `- {source_file} (Score: {score})`.
+- Standardized dictionary returned by `RAGRetriever` is parsed correctly.
+
 ### 4.4 Feature 4: Resilient Service Error Boundaries
 **Description:** Implements robust error validation and automatic retries for third-party network APIs to prevent sudden script crashes.
 

@@ -133,9 +133,13 @@ The pipeline follows a modular, feed-forward RAG architecture:
   - Acts as the primary application entrypoint.
   - Configures standard `argparse` to handle subcommand dispatching:
     - `ingest`: Execute document loader, chunker, and database indexing.
-    - `query "<query>"`: Direct-load pre-computed collections, execute retrieval, and print LLM response.
+    - `query "<query>"`: Direct-load pre-computed collections, execute retrieval, and format/print LLM response.
     - `interactive`: Start a warm chat shell loop (`Aurora-RAG >`) for rapid multi-turn searches.
   - **Database Empty Protection:** Verifies collection state before queries, gracefully warning users to run `ingest` first on missing on-disk collections.
+  - **CLI Formatting:** Visually separates responses into dedicated blocks:
+    - `LLM Response:` - The generated text answer.
+    - `Confidence Score:` - The highest matching similarity score in percentages.
+    - `Sources:` - Bulleted list of retrieved file paths and individual distance scores.
 
 ### 10. Legacy Retrospective Wrapper (`run_pipeline`)
 

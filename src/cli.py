@@ -1,9 +1,37 @@
 import argparse
 import sys
+from typing import Any
 
 from src.logger import get_logger
 
 logger = get_logger("cli")
+
+
+def print_formatted_response(result: dict[str, Any] | str) -> None:
+    """Formats and prints the retriever's standardized response dictionary.
+
+    This visualizes the text answer, confidence score, and document sources on
+    separate lines below the LLM response block.
+    """
+    if not isinstance(result, dict):
+        print(f"\nLLM Response:\n{result}\n")
+        return
+
+    answer = result.get("answer", "I don't know based on the available documents.")
+    confidence = result.get("confidence", "0.00%")
+    sources = result.get("sources", [])
+
+    print(f"\nLLM Response:\n{answer}\n")
+    print(f"Confidence Score: {confidence}")
+    print("Sources:")
+    if sources:
+        for src in sources:
+            source_file = src.get("source", "unknown")
+            score = src.get("score", 0.0)
+            print(f"- {source_file} (Score: {score:.2f})")
+    else:
+        print("- None")
+    print()
 
 
 def handle_ingest() -> None:
@@ -61,7 +89,7 @@ def handle_query(query_text: str) -> None:
     retriever = RAGRetriever(store, manager)
 
     result = retriever.generate_response(query_text)
-    print(f"\nLLM Response:\n{result.get('answer', result)}\n")
+    print_formatted_response(result)
 
 
 def handle_interactive() -> None:
@@ -96,7 +124,7 @@ def handle_interactive() -> None:
                 continue
 
             result = retriever.generate_response(query)
-            print(f"\nLLM Response:\n{result.get('answer', result)}\n")
+            print_formatted_response(result)
         except (KeyboardInterrupt, EOFError):
             print()
             logger.info("Interactive session interrupted.")
