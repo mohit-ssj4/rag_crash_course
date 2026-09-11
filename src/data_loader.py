@@ -2,6 +2,10 @@ from pathlib import Path
 
 from langchain_core.documents import Document
 
+from src.logger import get_logger
+
+logger = get_logger("data_loader")
+
 
 class DataLoader:
     """
@@ -44,6 +48,6 @@ class DataLoader:
                 )
             )
 
-        print(f"[INFO] Loaded {len(documents)} files successfully")
+        logger.info(f"Loaded {len(documents)} files successfully")
 
         return documents

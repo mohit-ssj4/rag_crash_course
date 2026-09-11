@@ -1,9 +1,15 @@
 import os
 import uuid
+from typing import Any
 
 import chromadb
 import numpy as np
 from langchain_core.documents import Document
+
+from src.config import COLLECTION_NAME, PERSIST_DIRECTORY
+from src.logger import get_logger
+
+logger = get_logger("vector_store")
 
 
 class VectorStore:
@@ -17,8 +23,8 @@ class VectorStore:
 
     def __init__(
         self,
-        collection_name: str = "aurora_docs",
-        persist_directory: str = "data/vector_store",
+        collection_name: str = COLLECTION_NAME,
+        persist_directory: str = PERSIST_DIRECTORY,
     ) -> None:
         """
         Initialize the vector store
@@ -30,24 +36,27 @@ class VectorStore:
         self.collection_name = collection_name
         self.persist_directory = persist_directory
         self.client = None
-        self.collection = None
+        self.collection: Any = None
         self._initialize_store()
 
-    def _initialize_store(self):
+    def _initialize_store(self) -> None:
         """Initialize ChromaDB client and collection"""
         # Create persistent ChromaDB client
         os.makedirs(self.persist_directory, exist_ok=True)
         self.client = chromadb.PersistentClient(path=self.persist_directory)
+
+        if self.client is None:
+            raise ValueError("No client found")
 
         # Get or create collection
         self.collection = self.client.get_or_create_collection(
             name=self.collection_name,
             metadata={"hnsw:space": "cosine"},
         )
-        print(f"[INFO] Vector store initialized. Collection: {self.collection_name}")
-        print(f"[INFO] Existing documents in collection: {self.collection.count()}")
+        logger.info(f"Vector store initialized. Collection: {self.collection_name}")
+        logger.info(f"Existing documents in collection: {self.collection.count()}")
 
-    def add_documents(self, documents: list[Document], embeddings: np.ndarray):
+    def add_documents(self, documents: list[Document], embeddings: np.ndarray) -> None:
         """
         Add documents and their embeddings to the vector store
 
@@ -56,7 +65,7 @@ class VectorStore:
             embeddings: Corresponding embeddings for the documents
         """
 
-        print(f"[INFO] Adding {len(documents)} documents to vector store")
+        logger.info(f"Adding {len(documents)} documents to vector store")
 
         # Prepare data for ChromaDB
         ids = []
@@ -83,7 +92,7 @@ class VectorStore:
 
         # Add to collection
         try:
-            if self.collection == None:
+            if self.collection is None:
                 raise ValueError("No collection found")
 
             self.collection.add(
@@ -92,11 +101,11 @@ class VectorStore:
                 metadatas=metadatas,
                 documents=documents_text,
             )
-            print(
-                f"[INFO] Successfully added {len(documents)} documents to vector store"
+            logger.info(
+                f"Successfully added {len(documents)} documents to vector store"
             )
-            print(f"[INFO] Total documents in collection: {self.collection.count()}")
+            logger.info(f"Total documents in collection: {self.collection.count()}")
 
         except Exception as e:
-            print(f"Error adding documents to vector store: {e}")
+            logger.error(f"Error adding documents to vector store: {e}")
             raise

@@ -1,6 +1,11 @@
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+from src.config import CHUNK_OVERLAP, CHUNK_SIZE
+from src.logger import get_logger
+
+logger = get_logger("data_chunker")
+
 
 class DataChunker:
     """
@@ -13,8 +18,8 @@ class DataChunker:
 
     def __init__(
         self,
-        chunk_size: int = 1000,
-        chunk_overlap: int = 200,
+        chunk_size: int = CHUNK_SIZE,
+        chunk_overlap: int = CHUNK_OVERLAP,
     ) -> None:
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
@@ -39,9 +44,8 @@ class DataChunker:
 
         chunks = splitter.split_documents(documents)
 
-        print(
-            f"[INFO] Split {len(documents)} documents into "
-            f"{len(chunks)} chunks "
+        logger.info(
+            f"Split {len(documents)} documents into {len(chunks)} chunks "
             f"(size={self.chunk_size}, overlap={self.chunk_overlap})."
         )
 

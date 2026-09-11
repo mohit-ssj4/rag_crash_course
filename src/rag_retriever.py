@@ -1,11 +1,13 @@
 from typing import Any
+from src.embedding_manager import EmbeddingManager
+from src.llm_client import groq_client, model_name
+from src.vector_store import VectorStore
+from src.logger import get_logger
 
-from embedding_manager import EmbeddingManager
-from llm_client import groq_client, model_name
-from vector_store import VectorStore
+logger = get_logger("rag_retriever")
 
 
-class RAGRetiever:
+class RAGRetriever:
     """
     Handles query-based retrieval from the vector store
 
@@ -14,7 +16,7 @@ class RAGRetiever:
         embedding_manager: Manager for generating query embeddings
     """
 
-    def __init__(self, vector_store: VectorStore, embedding_manager: EmbeddingManager):
+    def __init__(self, vector_store: VectorStore, embedding_manager: EmbeddingManager) -> None:
         """
         Initialize the retriever
 
@@ -39,14 +41,19 @@ class RAGRetiever:
         Returns:
             List of dictionaries containing retrieved documents and metadata
         """
-        print(f"[INFO] Retrieving documents for query: '{query}'")
-        print(f"[INFO] Top K: {top_k}, Score threshold: {score_threshold}")
+        logger.info(f"Retrieving documents for query: '{query}'")
+        logger.info(f"Top K: {top_k}, Score threshold: {score_threshold}")
+
+        # Validate query
+        if not query or not query.strip():
+            logger.info("Empty query received. Returning no documents.")
+            return []
 
         # Generate query embedding
         query_embedding = self.embedding_manager.generate_embeddings([query])[0]
 
         # Search in vector store
-        if self.vector_store.collection == None:
+        if self.vector_store.collection is None:
             raise ValueError("No vector store collection loaded")
 
         results = self.vector_store.collection.query(
@@ -54,7 +61,7 @@ class RAGRetiever:
         )
 
         # Process results
-        retrieved_docs = []
+        retrieved_docs: list[dict[str, Any]] = []
 
         if results["documents"] and results["documents"][0]:
             documents = results["documents"][0]
@@ -73,16 +80,16 @@ class RAGRetiever:
                         {
                             "id": doc_id,
                             "content": document,
-                            "metadata": metadata,
+                            "metadata": metadata or {},
                             "similarity_score": similarity_score,
                             "distance": distance,
                             "rank": i + 1,
                         }
                     )
 
-            print(f"[INFO] Retrieved {len(retrieved_docs)} documents (after filtering)")
+            logger.info(f"Retrieved {len(retrieved_docs)} documents (after filtering)")
         else:
-            print("[INFO] No documents found")
+            logger.info("No documents found")
 
         return retrieved_docs
 
@@ -92,39 +99,59 @@ class RAGRetiever:
         top_k: int = 5,
         min_score: float = 0.0,
         show_sources: bool = True,
-    ):
+    ) -> dict[str, Any]:
+        """
+        Generate synthesized response for a query utilizing RAG and Groq
+
+        Args:
+            query: The user query.
+            top_k: Number of semantic search results.
+            min_score: Similarity score threshold.
+            show_sources: Whether to return source documents in output.
+
+        Returns:
+            A dictionary with answer/sources, and confidence.
+        """
+        default_response = {
+            "answer": "I don't know based on the available documents.",
+            "sources": [],
+            "confidence": "0.00%",
+        }
+
+        if not query or not query.strip():
+            return default_response
+
         rag_results = self._retrieve(query, top_k=top_k, score_threshold=min_score)
         if not rag_results:
-            return {
-                "answer": "No relevant context found.",
-                "sources": [],
-                "confidence": 0.0,
-            }
+            return default_response
 
         # Prepare context and sources
         context = "\n\n".join([doc["content"] for doc in rag_results])
         sources = [
             {
-                "source": doc["metadata"].get(
-                    "source_file", doc["metadata"].get("source", "unknown")
+                "source": (doc["metadata"] or {}).get(
+                    "source_file", (doc["metadata"] or {}).get("source", "unknown")
                 ),
                 "score": doc["similarity_score"],
             }
             for doc in rag_results
         ]
-        confidence = max([doc["similarity_score"] for doc in rag_results]) * 100
+        
+        # Protect confidence score boundary constraints (0.0 to 100.0)
+        raw_confidence = max([doc["similarity_score"] for doc in rag_results]) * 100
+        confidence = max(0.0, min(100.0, raw_confidence))
 
         system_prompt = """You answer questions about Aurora Dynamics using ONLY the
-              provided context. Rules:
-              - If the context does not contain the answer, reply exactly:
-                "I don't know based on the available documents."
-              - Never use outside knowledge and never guess.
-              - Mention the source file(s) your answer came from if it is present in the context"""
+provided context. Rules:
+- If the context does not contain the answer, reply exactly:
+  "I don't know based on the available documents."
+- Never use outside knowledge and never guess.
+- Mention the source file(s) your answer came from if it is present in the context"""
         prompt = f"""Use the following context to answer the question concisely.
-            Context:
-            {context}
+Context:
+{context}
 
-            Question: {query}"""
+Question: {query}"""
 
         response = groq_client.chat.completions.create(
             model=model_name,
@@ -134,14 +161,18 @@ class RAGRetiever:
             ],
         )
 
-        answer = response.choices[0].message.content
+        answer = response.choices[0].message.content or ""
+        if not answer.strip():
+            return default_response
 
-        if not answer:
-            return ""
-
-        output = {"answer": answer, "confidence": f"{confidence:.2f}%"}
+        output: dict[str, Any] = {
+            "answer": answer.strip(), 
+            "confidence": f"{confidence:.2f}%"
+        }
 
         if show_sources:
             output["sources"] = sources
+        else:
+            output["sources"] = []
 
         return output

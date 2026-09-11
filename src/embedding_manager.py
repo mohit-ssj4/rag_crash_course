@@ -1,6 +1,10 @@
 import numpy as np
-from langchain_core.documents import Document
 from sentence_transformers import SentenceTransformer
+
+from src.config import EMBEDDING_BATCH_SIZE, EMBEDDING_MODEL_NAME
+from src.logger import get_logger
+
+logger = get_logger("embedding_manager")
 
 
 class EmbeddingManager:
@@ -13,7 +17,9 @@ class EmbeddingManager:
     """
 
     def __init__(
-        self, model_name: str = "all-MiniLM-L6-v2", batch_size: int = 32
+        self,
+        model_name: str = EMBEDDING_MODEL_NAME,
+        batch_size: int = EMBEDDING_BATCH_SIZE,
     ) -> None:
         """
         Initialize the embedding manager
@@ -36,7 +42,7 @@ class EmbeddingManager:
         Returns
             Numpy array of vector embeddings
         """
-        print(f"[INFO] Generating embeddings for {len(texts)} texts...")
+        logger.info(f"Generating embeddings for {len(texts)} texts...")
 
         embeddings = self.model.encode(
             texts,
@@ -44,6 +50,6 @@ class EmbeddingManager:
             convert_to_numpy=True,
             normalize_embeddings=True,
         )
-        print(f"[INFO] Generated embeddings with shape: {embeddings.shape}")
+        logger.info(f"Generated embeddings with shape: {embeddings.shape}")
 
         return embeddings

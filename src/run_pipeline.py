@@ -1,10 +1,10 @@
 import json
 
-from data_chunker import DataChunker
-from data_loader import DataLoader
-from embedding_manager import EmbeddingManager
-from rag_retriever import RAGRetiever
-from vector_store import VectorStore
+from src.data_chunker import DataChunker
+from src.data_loader import DataLoader
+from src.embedding_manager import EmbeddingManager
+from src.rag_retriever import RAGRetriever
+from src.vector_store import VectorStore
 
 
 def run_pipeline() -> None:
@@ -26,7 +26,7 @@ def run_pipeline() -> None:
     vector_store.add_documents(chunks, embeddings)
 
     # Step 5: Retieve data from RAG
-    retriever = RAGRetiever(vector_store, embedding_manager)
+    retriever = RAGRetriever(vector_store, embedding_manager)
 
     while True:
         query = input("\nEnter your query: ").strip()
