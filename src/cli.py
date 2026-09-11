@@ -21,9 +21,9 @@ def print_formatted_response(result: dict[str, Any] | str) -> None:
     confidence = result.get("confidence", "0.00%")
     sources = result.get("sources", [])
 
-    print(f"\nLLM Response:\n{answer}\n")
-    print(f"Confidence Score: {confidence}")
-    print("Sources:")
+    print(f"\nLLM Response:\n{answer}")
+    print(f"\nConfidence Score:\n{confidence}")
+    print("\nSources:")
     if sources:
         for src in sources:
             source_file = src.get("source", "unknown")
