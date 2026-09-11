@@ -1,0 +1,20 @@
+Aurora Dynamics - Company Overview
+
+Aurora Dynamics is a fictional robotics company used as the sample dataset
+for this RAG crash course. Everything in these documents is made up.
+
+Aurora Dynamics was founded in 2019 in Bengaluru, India, by Priya Raman and
+Daniel Okafor. The company builds autonomous delivery robots for hospital
+campuses. Its flagship product is the Carrier X2, a four-wheeled robot that
+transports medicine, lab samples, and meals between hospital wards.
+
+The company has 214 employees across three offices: the headquarters in
+Bengaluru, an engineering office in Austin, Texas, and a customer support
+hub in Lisbon, Portugal.
+
+Aurora Dynamics is privately funded. Its most recent funding round was a
+Series B of 48 million dollars, led by Meridian Growth Partners in
+March 2024.
+
+The company mission statement is: "Move critical supplies so caregivers
+can stay with patients."

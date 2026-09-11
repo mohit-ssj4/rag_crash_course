@@ -1,0 +1,32 @@
+Aurora Dynamics - Q1 2025 Business Update (Internal)
+
+This is an internal summary shared with all employees in April 2025.
+
+Fleet growth:
+At the end of Q1 2025, Aurora Dynamics had 1,830 Carrier X2 robots
+deployed across 96 hospital campuses in 11 countries. That is up from
+1,410 robots at the end of 2024.
+
+Revenue:
+Quarterly recurring revenue reached 15.9 million dollars, a 22 percent
+increase over the previous quarter.
+
+Reliability:
+Average robot uptime was 99.1 percent. The most common cause of downtime
+was blocked lidar sensors, which accounted for 38 percent of all support
+tickets.
+
+New business:
+The company signed its largest contract to date with the Meridian Health
+Network: 240 robots across 8 hospitals in Germany, rolling out through
+2025 and 2026.
+
+Hiring:
+The company plans to grow from 214 to 260 employees by the end of 2025,
+with most new roles in the Austin engineering office.
+
+Priorities for Q2:
+1. Reduce lidar related tickets by shipping the self cleaning lidar dome.
+2. Launch the Carrier X2 Cold variant with a refrigerated compartment for
+   blood and vaccine transport.
+3. Complete the Meridian Health Network pilot in Munich.

@@ -1,0 +1,32 @@
+Aurora Dynamics - Support Runbook: Common Carrier X2 Issues
+
+This runbook is used by the Lisbon support team to resolve frequent
+customer issues with the Carrier X2 robot.
+
+Issue: robot stops in a corridor and blinks orange.
+Meaning: the lidar sensor is blocked or dirty.
+Fix: wipe the lidar dome with the microfiber cloth from the maintenance
+kit. If the robot still blinks orange after cleaning, restart it by
+holding the power button for 8 seconds. Escalate to level 2 support if
+the issue repeats more than twice in one day.
+
+Issue: robot cannot call the elevator.
+Meaning: the elevator integration service has lost its network session.
+Fix: open the fleet dashboard, select the robot, and press "Reconnect
+building systems". Reconnection takes about 2 minutes. If it fails,
+check that the hospital's integration gateway has power.
+
+Issue: compartment will not open after badge scan.
+Meaning: the badge reader cache is stale.
+Fix: sync badges from the fleet dashboard using "Push badge list". The
+sync completes in under 5 minutes. As a temporary measure, a nurse
+supervisor can open the compartment with the override code from the
+shift binder.
+
+Issue: battery drains faster than usual.
+Meaning: wheel brushes are worn or a wheel is misaligned, increasing
+motor load.
+Fix: schedule a DockBrush inspection. Robots with battery life below
+10 hours must be rotated out of service.
+
+Escalation: level 2 support is reachable at ext 4400, 24 hours a day.

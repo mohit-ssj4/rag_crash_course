@@ -1,0 +1,25 @@
+Aurora Dynamics - Product Guide: Carrier X2
+
+The Carrier X2 is the flagship delivery robot of Aurora Dynamics.
+
+Key specifications:
+- Payload capacity: 25 kilograms
+- Top speed: 5.4 kilometers per hour indoors
+- Battery life: 14 hours of continuous operation
+- Charging time: 90 minutes on a fast dock, 4 hours on a standard dock
+- Navigation: lidar plus six depth cameras, no floor markers required
+- Compartments: two lockable compartments, each opened by staff badge scan
+
+The Carrier X2 can call elevators on its own. It integrates with elevator
+systems from three vendors: Kone, Otis, and Schindler. Integration with a
+new elevator vendor typically takes six weeks.
+
+The robot cleans its own wheels at the end of every shift using the
+DockBrush station, which is sold separately.
+
+Pricing: hospitals do not buy the robot outright. Aurora Dynamics charges
+a subscription of 2,900 dollars per robot per month, which includes
+maintenance, software updates, and 24/7 remote monitoring.
+
+The Carrier X2 replaced the earlier Carrier X1 in 2023. The X1 is no
+longer sold but is still supported until December 2026.
