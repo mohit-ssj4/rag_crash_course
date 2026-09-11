@@ -40,6 +40,23 @@ def _get_env_non_negative_int(key: str, default: int) -> int:
         ) from e
 
 
+def _get_env_bool(key: str, default: bool) -> bool:
+    """Helper function to safely cast and validate environment variables as booleans."""
+    val = os.getenv(key)
+    if val is None or val.strip() == "":
+        return default
+    val_stripped = val.strip().lower()
+    if val_stripped in ("true", "1", "t", "y", "yes"):
+        return True
+    elif val_stripped in ("false", "0", "f", "n", "no"):
+        return False
+    else:
+        raise ValueError(
+            f"Invalid configuration value for '{key}': '{val}'. "
+            f"Configuration error: expected a boolean value."
+        )
+
+
 # Vector Database settings
 PERSIST_DIRECTORY: str = os.getenv("PERSIST_DIRECTORY", "data/vector_store")
 COLLECTION_NAME: str = os.getenv("COLLECTION_NAME", "aurora_docs")
@@ -57,6 +74,7 @@ CHUNK_OVERLAP: int = _get_env_non_negative_int("CHUNK_OVERLAP", 200)
 
 # Logging settings
 LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO").strip().upper()
+CONSOLE_LOGGING: bool = _get_env_bool("CONSOLE_LOGGING", True)
 
 # Validate that overlap is smaller than chunk size
 if CHUNK_OVERLAP >= CHUNK_SIZE:

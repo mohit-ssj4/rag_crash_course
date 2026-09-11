@@ -75,3 +75,40 @@ def test_config_validation_overlap_exceeds(monkeypatch):
     monkeypatch.setenv("CHUNK_OVERLAP", "600")
     with pytest.raises(ValueError, match="must be less than"):
         importlib.reload(config)
+
+
+def test_config_console_logging_defaults(monkeypatch):
+    monkeypatch.delenv("CONSOLE_LOGGING", raising=False)
+    importlib.reload(config)
+    assert config.CONSOLE_LOGGING is True
+
+
+@pytest.mark.parametrize(
+    "env_val, expected",
+    [
+        ("true", True),
+        ("TRUE", True),
+        ("1", True),
+        ("t", True),
+        ("yes", True),
+        ("y", True),
+        ("false", False),
+        ("FALSE", False),
+        ("0", False),
+        ("f", False),
+        ("no", False),
+        ("n", False),
+    ],
+)
+def test_config_console_logging_custom_values(monkeypatch, env_val, expected):
+    monkeypatch.setenv("CONSOLE_LOGGING", env_val)
+    importlib.reload(config)
+    assert config.CONSOLE_LOGGING is expected
+
+
+def test_config_console_logging_invalid(monkeypatch):
+    monkeypatch.setenv("CONSOLE_LOGGING", "invalid_boolean_string")
+    with pytest.raises(
+        ValueError, match="Invalid configuration value for 'CONSOLE_LOGGING'"
+    ):
+        importlib.reload(config)

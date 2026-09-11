@@ -55,6 +55,7 @@ The pipeline follows a modular, feed-forward RAG architecture:
     - `CHUNK_SIZE` (default: `1000`)
     - `CHUNK_OVERLAP` (default: `200`)
     - `LOG_LEVEL` (default: `"INFO"`)
+    - `CONSOLE_LOGGING` (default: `True`)
 
 ### 2. Standardized Global Logging (`logger`)
 
@@ -62,6 +63,7 @@ The pipeline follows a modular, feed-forward RAG architecture:
 - **Functionality:**
   - Instantiates standardized, severity-aware loggers utilizing Python's built-in `logging` module.
   - Formats all log lines globally: `[YYYY-MM-DD HH:MM:SS] [LEVEL] [MODULE] - MESSAGE`.
+  - Supports disabling terminal-oriented log outputs via `CONSOLE_LOGGING = False` (attaches a `logging.NullHandler` instead of `StreamHandler(sys.stderr)`), ensuring clean output for scripts and query mode.
   - Features strict logging level whitelisting (`VALID_LOG_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}`) to block malicious lookup injection or class TypeErrors.
   - Controls handler propagation to prevent double logging inside standard CLI outputs.
 

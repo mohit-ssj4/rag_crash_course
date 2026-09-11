@@ -45,3 +45,9 @@ def mock_groq_client(monkeypatch):
     # Apply monkeypatching
     monkeypatch.setattr("groq.Groq", lambda *args, **kwargs: mock_client)
     monkeypatch.setattr("src.llm_client.groq_client", mock_client)
+
+
+@pytest.fixture(autouse=True)
+def mock_load_dotenv(monkeypatch):
+    """Global autouse fixture to disable load_dotenv and enforce complete test isolation from local .env."""
+    monkeypatch.setattr("dotenv.load_dotenv", lambda *args, **kwargs: None)

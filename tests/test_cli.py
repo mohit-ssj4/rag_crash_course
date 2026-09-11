@@ -61,15 +61,13 @@ def test_print_formatted_response_dict(capsys):
     test_result = {
         "answer": "The budget is $400.",
         "confidence": "85.23%",
-        "sources": [
-            {"source": "data/04-remote-work-policy.txt", "score": 0.8523}
-        ]
+        "sources": [{"source": "data/04-remote-work-policy.txt", "score": 0.8523}],
     }
     cli.print_formatted_response(test_result)
     captured = capsys.readouterr()
-    
+
     assert "LLM Response:\nThe budget is $400." in captured.out
-    assert "Confidence Score: 85.23%" in captured.out
+    assert "Confidence Score:\n85.23%" in captured.out
     assert "Sources:\n- data/04-remote-work-policy.txt (Score: 0.85)" in captured.out
 
 
@@ -77,13 +75,13 @@ def test_print_formatted_response_empty_sources(capsys):
     test_result = {
         "answer": "No documents found.",
         "confidence": "0.00%",
-        "sources": []
+        "sources": [],
     }
     cli.print_formatted_response(test_result)
     captured = capsys.readouterr()
-    
+
     assert "LLM Response:\nNo documents found." in captured.out
-    assert "Confidence Score: 0.00%" in captured.out
+    assert "Confidence Score:\n0.00%" in captured.out
     assert "Sources:\n- None" in captured.out
 
 
